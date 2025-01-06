@@ -1,0 +1,22 @@
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "mique-ce980",
+          "appId": "1:192886893594:android:6929de482ec06a9fc7b5a3",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "mique-ce980",
+          "configurations": {
+            "android": "1:192886893594:android:6929de482ec06a9fc7b5a3",
+            "ios": "1:192886893594:ios:ec94a19c4762a4e8c7b5a3"
+          }
+        }
+      }
+    }
+  }
+}
