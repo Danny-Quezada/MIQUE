@@ -8,11 +8,39 @@ class SettingColor {
 
   static ThemeData themeData = ThemeData(
       useMaterial3: true,
+      textButtonTheme: TextButtonThemeData(
+        style: ButtonStyle(
+          foregroundColor: const WidgetStatePropertyAll(principalColor),
+          textStyle: WidgetStateProperty.all(
+            const TextStyle(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+      ),
       fontFamily: "Onest",
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ButtonStyle(
+          foregroundColor: const WidgetStatePropertyAll(Colors.white),
+          backgroundColor: WidgetStateProperty.all(principalColor),
+          textStyle: WidgetStateProperty.all(
+            const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          fixedSize: const WidgetStatePropertyAll(Size(double.maxFinite, 50)),
+          shape: WidgetStateProperty.all(
+            RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12.0),
+            ),
+          ),
+        ),
+      ),
       colorScheme: ColorScheme.fromSeed(seedColor: principalColor),
       inputDecorationTheme: InputDecorationTheme(
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.0),
+          borderRadius: BorderRadius.circular(16.0),
           borderSide: const BorderSide(color: borderColor),
         ),
       ));
