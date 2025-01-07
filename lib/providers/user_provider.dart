@@ -1,34 +1,33 @@
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:mi_que/domain/entities/user_model.dart';
 import 'package:mi_que/domain/interfaces/iuser_model.dart';
 
 class UserProvider extends ChangeNotifier {
-
   IUserModel iUserModel;
   User? firebaseUser;
   UserModel? userModel;
   UserProvider({required this.iUserModel});
 
-   Future<void> loadCurrentUser() async {
+  Future<void> loadCurrentUser() async {
     try {
       firebaseUser = FirebaseAuth.instance.currentUser;
-      userModel = await iUserModel
-          .getUserById(FirebaseAuth.instance.currentUser!.uid);
+      userModel =
+          await iUserModel.getUserById(FirebaseAuth.instance.currentUser!.uid);
       notifyListeners();
     } catch (e) {
       rethrow;
     }
   }
-  Future<void> closeSession()async{
-    try{
+
+  Future<void> closeSession() async {
+    try {
       await FirebaseAuth.instance.signOut();
-      
-    }catch(e){
+    } catch (e) {
       rethrow;
     }
   }
+
   Future<String> createUser(UserModel user) async {
     try {
       return await iUserModel.create(user);
@@ -52,8 +51,4 @@ class UserProvider extends ChangeNotifier {
       rethrow;
     }
   }
-
-  
-  
-
 }

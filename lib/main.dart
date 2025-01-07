@@ -1,8 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:mi_que/domain/interfaces/ibook_model.dart';
 import 'package:mi_que/domain/interfaces/iuser_model.dart';
+import 'package:mi_que/infraestructure/repository/book_repository.dart';
 import 'package:mi_que/infraestructure/repository/user_repository.dart';
+import 'package:mi_que/providers/book_provider.dart';
 import 'package:mi_que/providers/user_provider.dart';
 import 'package:mi_que/ui/pages/bottom_navigation_page.dart';
 import 'package:mi_que/ui/pages/initial_page.dart';
@@ -32,6 +35,8 @@ void main(List<String> args) async {
             create: (context) => UserProvider(
                 iUserModel:
                     Provider.of<IUserModel>(context, listen: false))),
+                    Provider<IBookModel>(create: (_) => BookRepository()),
+      ChangeNotifierProvider<BookProvider>(create: (context)=> BookProvider(iBookModel: Provider.of<IBookModel>(context, listen: false))),
     ],
     child: MaterialApp(
       debugShowCheckedModeBanner: false,
@@ -60,3 +65,4 @@ void main(List<String> args) async {
     ),
   ));
 }
+
