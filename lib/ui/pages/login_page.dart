@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:mi_que/providers/user_provider.dart';
+import 'package:mi_que/ui/pages/bottom_navigation_page.dart';
 import 'package:mi_que/ui/widgets/logo_widget.dart';
 import 'package:mi_que/ui/widgets/safe_scaffold.dart';
+import 'package:mi_que/ui/widgets/snack_bar.dart';
+import 'package:provider/provider.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -60,12 +64,7 @@ class _LoginPageState extends State<LoginPage> {
                     ElevatedButton(
                       onPressed: () {
                         if (_formKey.currentState!.validate()) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                  'Correo: ${_emailController.text}\nContraseña: ${_passwordController.text}'),
-                            ),
-                          );
+                          loginUser();
                         }
                       },
                       child: const Text("Ingresar"),
@@ -90,14 +89,32 @@ class _LoginPageState extends State<LoginPage> {
                   ],
                 ),
                 const Text("O iniciar sesión con:"),
-                Container(
+                SizedBox(
                   width: 250,
                   height: 70,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
                       IconButton(
-                          onPressed: () {},
+                          onPressed: () async {
+                          try {
+                            final userProvider = Provider.of<UserProvider>(
+                                context,
+                                listen: false);
+                            bool isSucces =
+                                await userProvider.signInWithGoogle();
+                            await userProvider.loadCurrentUser();
+                            if (isSucces) {
+                              if (!mounted) return;
+                              Navigator.of(context).pushReplacement(
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          const BottomNavigationPage()));
+                            }
+                          } catch (e) {
+                            rethrow;
+                          }
+                          },
                           icon: Image.network(
                               'http://pngimg.com/uploads/google/google_PNG19635.png',
                               fit: BoxFit.cover)),
@@ -110,6 +127,25 @@ class _LoginPageState extends State<LoginPage> {
         ),
       ),
     );
+  }
+    void loginUser() async {
+    try {
+      if (_emailController.text.trim().isNotEmpty &&
+          _passwordController.text.trim().isNotEmpty) {
+        final userProvider = Provider.of<UserProvider>(context, listen: false);
+        await userProvider.verifyUser(
+            _emailController.text, _passwordController.text);
+        await userProvider.loadCurrentUser();
+        
+        if (!mounted) return;
+        Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (context) => const BottomNavigationPage()));
+      } else {
+        throw ("Error: Debe de completar todos los campos");
+      }
+    } catch (e) {
+      showSnackBar(context, e.toString());
+    }
   }
 }
 
