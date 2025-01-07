@@ -85,7 +85,8 @@ class _SignUpPageState extends State<SignUpPage> {
                               id: '',
                               name: _nameController.text,
                               books: [],
-                              email: _passwordController.text);
+                              email: _emailController.text);
+                          userModel.password = _passwordController.text;
                           signUpUser(userModel);
                         }
                       },
