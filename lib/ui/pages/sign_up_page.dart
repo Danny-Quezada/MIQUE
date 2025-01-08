@@ -137,9 +137,12 @@ class _SignUpPageState extends State<SignUpPage> {
                               rethrow;
                             }
                           },
-                          icon: Image.network(
-                              'http://pngimg.com/uploads/google/google_PNG19635.png',
-                              fit: BoxFit.cover)),
+                          icon: Image.asset(
+                            'assets/images/google.png',
+                            fit: BoxFit.cover,
+                            height: 35,
+                            width: 35,
+                          )),
                     ],
                   ),
                 )

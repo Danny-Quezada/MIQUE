@@ -97,27 +97,30 @@ class _LoginPageState extends State<LoginPage> {
                     children: <Widget>[
                       IconButton(
                           onPressed: () async {
-                          try {
-                            final userProvider = Provider.of<UserProvider>(
-                                context,
-                                listen: false);
-                            bool isSucces =
-                                await userProvider.signInWithGoogle();
-                            await userProvider.loadCurrentUser();
-                            if (isSucces) {
-                              if (!mounted) return;
-                              Navigator.of(context).pushReplacement(
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          const BottomNavigationPage()));
+                            try {
+                              final userProvider = Provider.of<UserProvider>(
+                                  context,
+                                  listen: false);
+                              bool isSucces =
+                                  await userProvider.signInWithGoogle();
+                              await userProvider.loadCurrentUser();
+                              if (isSucces) {
+                                if (!mounted) return;
+                                Navigator.of(context).pushReplacement(
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            const BottomNavigationPage()));
+                              }
+                            } catch (e) {
+                              rethrow;
                             }
-                          } catch (e) {
-                            rethrow;
-                          }
                           },
-                          icon: Image.network(
-                              'http://pngimg.com/uploads/google/google_PNG19635.png',
-                              fit: BoxFit.cover)),
+                          icon: Image.asset(
+                            'assets/images/google.png',
+                            fit: BoxFit.cover,
+                            height: 35,
+                            width: 35,
+                          )),
                     ],
                   ),
                 )
@@ -128,7 +131,8 @@ class _LoginPageState extends State<LoginPage> {
       ),
     );
   }
-    void loginUser() async {
+
+  void loginUser() async {
     try {
       if (_emailController.text.trim().isNotEmpty &&
           _passwordController.text.trim().isNotEmpty) {
@@ -136,10 +140,10 @@ class _LoginPageState extends State<LoginPage> {
         await userProvider.verifyUser(
             _emailController.text, _passwordController.text);
         await userProvider.loadCurrentUser();
-        
+
         if (!mounted) return;
-        Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (context) => const BottomNavigationPage()));
+        Navigator.of(context).pushReplacement(MaterialPageRoute(
+            builder: (context) => const BottomNavigationPage()));
       } else {
         throw ("Error: Debe de completar todos los campos");
       }
