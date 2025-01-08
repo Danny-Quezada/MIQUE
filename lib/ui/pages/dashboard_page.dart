@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_skeleton_ui/flutter_skeleton_ui.dart';
 import 'package:mi_que/domain/entities/transaction_model.dart';
 import 'package:mi_que/providers/book_provider.dart';
 import 'package:mi_que/providers/user_provider.dart';
@@ -40,7 +41,10 @@ class DashboardPage extends StatelessWidget {
             return const Center(
               child: Text("Error al cargar el dashboard."),
             );
-          } else if (snapshot.hasData) {
+          } else if (snapshot.connectionState == ConnectionState.waiting) {
+            return const SkeletonView();
+          }
+          if (snapshot.hasData) {
             final transactions = snapshot.data!.toList();
 
             final incomes = transactions
@@ -51,38 +55,53 @@ class DashboardPage extends StatelessWidget {
                 .where((x) => x.amount < 0)
                 .fold<double>(0.0, (sum, element) => sum + element.amount);
 
-            return SingleChildScrollView(
-              padding: EdgeInsets.zero,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  AmountContainerWidget(
-                      amount: incomes + expenses,
-                      title: "Balance neto total",
-                      color: (incomes + expenses) < 0
-                          ? SettingColor.redColor
-                          : SettingColor.greenColor),
-                  const SizedBox(
-                    height: 30,
-                  ),
-                  _buildIncomeExpenseChart(incomes, expenses.abs()),
-                  const SizedBox(
-                    height: 30,
-                  ),
-                  _buildFutureProjectionLineChart(transactions),
-                  const SizedBox(
-                    height: 30,
-                  ),
-                  _buildMonthlyLineChart(transactions),
-                  const SizedBox(
-                    height: 30,
-                  ),
-                  _buildDailyExpenseChart(transactions),
-                ],
-              ),
-            );
+            return transactions.length == 0
+                ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Image.asset(
+                          "assets/images/add.png",
+                          height: 200,
+                          width: 200,
+                          fit: BoxFit.cover,
+                        ),
+                        Text("Agrega transacciones para poder ver resumen")
+                      ],
+                    ),
+                  )
+                : SingleChildScrollView(
+                    padding: EdgeInsets.zero,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        AmountContainerWidget(
+                            amount: incomes + expenses,
+                            title: "Balance neto total",
+                            color: (incomes + expenses) < 0
+                                ? SettingColor.redColor
+                                : SettingColor.greenColor),
+                        const SizedBox(
+                          height: 30,
+                        ),
+                        _buildIncomeExpenseChart(incomes, expenses.abs()),
+                        const SizedBox(
+                          height: 30,
+                        ),
+                        _buildFutureProjectionLineChart(transactions),
+                        const SizedBox(
+                          height: 30,
+                        ),
+                        _buildMonthlyLineChart(transactions),
+                        const SizedBox(
+                          height: 30,
+                        ),
+                        _buildDailyExpenseChart(transactions),
+                      ],
+                    ),
+                  );
           }
-          if (snapshot.connectionState == ConnectionState.waiting) {}
+
           return Container();
         },
       ),
@@ -314,4 +333,34 @@ class ChartData {
   final Color? color;
   bool? isPrediction;
   ChartData(this.category, this.value, {this.color, this.isPrediction});
+}
+
+class SkeletonView extends StatelessWidget {
+  const SkeletonView({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SkeletonItem(
+        child: SingleChildScrollView(
+      child: Column(
+        children: [
+          const SkeletonAvatar(
+            style: SkeletonAvatarStyle(height: 100, width: double.infinity),
+          ),
+          SkeletonParagraph(
+            style: const SkeletonParagraphStyle(lines: 1),
+          ),
+          const SkeletonAvatar(
+            style: SkeletonAvatarStyle(height: 300, width: double.infinity),
+          ),
+          SkeletonParagraph(
+            style: const SkeletonParagraphStyle(lines: 1),
+          ),
+          const SkeletonAvatar(
+            style: SkeletonAvatarStyle(height: 300, width: double.infinity),
+          )
+        ],
+      ),
+    ));
+  }
 }

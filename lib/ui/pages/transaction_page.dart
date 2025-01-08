@@ -11,6 +11,7 @@ import 'package:mi_que/ui/widgets/amount_container_widget.dart';
 import 'package:mi_que/ui/widgets/safe_scaffold.dart';
 import 'package:mi_que/ui/widgets/transaction_widget.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_skeleton_ui/flutter_skeleton_ui.dart';
 
 class TransactionPage extends StatelessWidget {
   BookModel bookModel;
@@ -33,7 +34,10 @@ class TransactionPage extends StatelessWidget {
                 return const Center(
                   child: Text("Error al cargar las transacciones"),
                 );
-              } else if (snapshot.hasData) {
+              } else if (snapshot.connectionState == ConnectionState.waiting) {
+                return const SkeletonView();
+              }
+              if (snapshot.hasData) {
                 final incomes = snapshot.data!
                     .where((x) => x.amount > 0)
                     .fold<double>(0.0, (sum, element) => sum + element.amount);
@@ -114,6 +118,40 @@ class TransactionPage extends StatelessWidget {
               }
               return Container();
             }));
+  }
+}
+
+class SkeletonView extends StatelessWidget {
+  const SkeletonView({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SkeletonItem(
+        child: Column(
+      children: [
+        const SkeletonAvatar(
+          style: SkeletonAvatarStyle(width: double.infinity, height: 30),
+        ),
+        const Row(
+          children: [
+            Expanded(
+              child: SkeletonAvatar(
+                style: SkeletonAvatarStyle(width: double.infinity, height: 30),
+              ),
+            ),
+            Expanded(
+              child: SkeletonAvatar(
+                style: SkeletonAvatarStyle(width: double.infinity, height: 30),
+              ),
+            )
+          ],
+        ),
+        SkeletonParagraph(
+          style: const SkeletonParagraphStyle(lines: 1),
+        ),
+        Expanded(child: SkeletonListView())
+      ],
+    ));
   }
 }
 

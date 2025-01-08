@@ -9,11 +9,12 @@ import 'package:mi_que/ui/utils/date_converter.dart';
 import 'package:mi_que/ui/utils/setting_color.dart';
 import 'package:mi_que/ui/widgets/book_widget.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_skeleton_ui/flutter_skeleton_ui.dart';
+
 
 class PrincipalPage extends StatelessWidget {
   final TextEditingController _searchController = TextEditingController();
   PrincipalPage({super.key});
-
 
   @override
   Widget build(BuildContext context) {
@@ -67,6 +68,9 @@ class PrincipalPage extends StatelessWidget {
                     return const Center(
                       child: Text("Error al cargar los libros"),
                     );
+                  } else if (snapshot.connectionState ==
+                      ConnectionState.waiting) {
+                    return SkeletonListView();
                   }
                   if (snapshot.hasData) {
                     return ListView.builder(

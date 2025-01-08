@@ -30,6 +30,8 @@ dependencies:
   flutter_iconpicker_plus: ^3.2.3
   syncfusion_flutter_charts: 22.1.39
   syncfusion_flutter_core: 22.1.39
+  flutter_skeleton_ui: ^0.0.6
+  
 
 dev_dependencies:
   flutter_test:
