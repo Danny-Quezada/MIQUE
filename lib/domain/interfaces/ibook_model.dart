@@ -5,7 +5,7 @@ abstract class IBookModel {
 Future<int> createTransaction(TransactionModel transaction,String bookId, String userId);
 Stream<Iterable<TransactionModel>> readTransactions(String userId,String bookId);
 Stream<Iterable<BookModel>> readBooks(String userId);
-Future<bool> deleteTransaction(TransactionModel transaction,String bookId, String userId);
+Future<bool> deleteTransaction(TransactionModel transaction,String bookId, String userId, String date);
 Future<bool> updateTransaction(TransactionModel transaction,String bookId, String userId);
 Future<bool> deteleBook(String bookId, String userId);
 Future<int> create(BookModel book, String userId);

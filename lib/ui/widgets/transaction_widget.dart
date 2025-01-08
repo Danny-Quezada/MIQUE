@@ -33,11 +33,11 @@ class TransactionWidget extends StatelessWidget {
         style: const TextStyle(fontWeight: FontWeight.bold),
       ),
       subtitle: Text(
-        "Actualizado: ${transactionModel.date}",
+        transactionModel.date,
         style: const TextStyle(fontSize: 12, color: Colors.grey),
       ),
       trailing: Text(
-        (transactionModel.amount > 0 ? "+" : "-") +
+        (transactionModel.amount > 0 ? "+" : "") +
             transactionModel.amount.toString(),
         style: TextStyle(
           color: transactionModel.amount > 0 ? Colors.green : Colors.red,

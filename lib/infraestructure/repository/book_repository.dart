@@ -8,16 +8,99 @@ class BookRepository implements IBookModel {
 
   @override
   Future<int> createTransaction(
-      TransactionModel transaction, String bookId, String userId) {
-    // TODO: implement createTranasaction
-    throw UnimplementedError();
+      TransactionModel transaction, String bookId, String userId) async {
+    try {
+      final firestore = _fDataSource.firestore;
+
+      final transactionRef = firestore
+          .collection('User')
+          .doc(userId)
+          .collection('Book')
+          .doc(bookId)
+          .collection('Transaction');
+
+      final bookRef = firestore
+          .collection('User')
+          .doc(userId)
+          .collection('Book')
+          .doc(bookId);
+
+      // Ejecutar la transacción de manera correcta
+      await firestore.runTransaction((transactionBatch) async {
+        // Obtener el snapshot del libro (lectura primero)
+        final bookSnapshot = await transactionBatch.get(bookRef);
+
+        if (bookSnapshot.exists) {
+          double currentAmount =
+              (bookSnapshot.data()?['amount'] ?? 0.0).toDouble();
+
+          // Calcular nuevo amount
+          double updatedAmount = currentAmount + transaction.amount;
+
+          // Escribir la nueva transacción (después de la lectura)
+          final newTransactionRef = transactionRef.doc();
+          transactionBatch.set(newTransactionRef, transaction.toFirestore());
+
+          // Actualizar el amount del libro
+          transactionBatch.update(
+              bookRef, {'amount': updatedAmount, 'date': transaction.date});
+        }
+      });
+
+      return 1; // Éxito
+    } catch (e) {
+      print('Error creating transaction: $e');
+      return 0; // Error
+    }
   }
 
   @override
   Future<bool> deleteTransaction(
-      TransactionModel transaction, String bookId, String userId) {
-    // TODO: implement deleteTransaction
-    throw UnimplementedError();
+      TransactionModel transaction, String bookId, String userId,String date)async {
+        try {
+    // Referencia al documento del libro
+    var bookRef = _fDataSource.firestore
+        .collection('User')
+        .doc(userId)
+        .collection('Book')
+        .doc(bookId);
+
+    // Referencia a la transacción dentro del libro
+    var transactionRef =
+        bookRef.collection('Transaction').doc(transaction.id);
+
+    // Ejecutar transacción de Firestore
+    await _fDataSource.firestore.runTransaction((transactionFirestore) async {
+      // Obtener el documento del libro
+      var bookSnapshot = await transactionFirestore.get(bookRef);
+
+      if (!bookSnapshot.exists) {
+        throw Exception('Book does not found');
+      }
+
+      // Obtener los datos actuales del libro
+      var bookData = bookSnapshot.data()!;
+      double currentAmount = bookData['amount'] ?? 0.0;
+
+      // Calcular el nuevo monto después de eliminar la transacción
+      
+      double newAmount = currentAmount - transaction.amount;
+
+      // Actualizar el campo 'amount' en el documento del libro
+      transactionFirestore.update(bookRef, {
+        'amount': newAmount,
+        "date": date
+      });
+
+      // Eliminar la transacción de la subcolección 'transactions'
+      transactionFirestore.delete(transactionRef);
+    });
+
+    return true;
+  } catch (e) {
+    print('Error: $e');
+    return false;
+  }
   }
 
   @override
@@ -60,8 +143,20 @@ class BookRepository implements IBookModel {
   @override
   Stream<Iterable<TransactionModel>> readTransactions(
       String userId, String bookId) {
-    // TODO: implement readTransactions
-    throw UnimplementedError();
+    try {
+      return _fDataSource.firestore
+          .collection('User')
+          .doc(userId)
+          .collection('Book')
+          .doc(bookId)
+          .collection('Transaction')
+          .snapshots()
+          .map((snapshot) => snapshot.docs.map(
+              (doc) => TransactionModel.fromFirestore(doc.data(), doc.id)));
+    } catch (e) {
+      print('Error reading transactions: $e');
+      return Stream.error('Failed to load transactions');
+    }
   }
 
   @override
