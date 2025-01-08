@@ -2,6 +2,7 @@ import 'package:mi_que/domain/db/firebase_data_source.dart';
 import 'package:mi_que/domain/entities/book_model.dart';
 import 'package:mi_que/domain/entities/transaction_model.dart';
 import 'package:mi_que/domain/interfaces/ibook_model.dart';
+import 'package:rxdart/rxdart.dart';
 
 class BookRepository implements IBookModel {
   final FirebaseDataSource _fDataSource = FirebaseDataSource();
@@ -209,15 +210,19 @@ class BookRepository implements IBookModel {
   }
 
   @override
-  Stream<Iterable<TransactionModel>> readTransactionByUser(
-      String userId) async* {
+  Stream<List<TransactionModel>> readTransactionByUser(String userId) async* {
     yield* _fDataSource.firestore
         .collection('User')
         .doc(userId)
         .collection('Book')
         .snapshots()
         .asyncExpand((bookSnapshot) {
-      // Crear streams para cada libro y combinarlos
+      if (bookSnapshot.docs.isEmpty) {
+        // Si no hay libros, devolvemos una lista vacía
+        return Stream.value([]);
+      }
+
+      // Crear streams para cada libro
       List<Stream<List<TransactionModel>>> streams =
           bookSnapshot.docs.map((bookDoc) {
         return bookDoc.reference
@@ -230,11 +235,15 @@ class BookRepository implements IBookModel {
               transactionDoc.id,
             );
           }).toList();
-        });
+        }).startWith([]); // Emitimos lista vacía si no hay transacciones
       }).toList();
 
-      // Combinar todos los streams en uno solo
-      return Stream.fromFutures(streams.map((s) => s.first));
+      // Combina todos los streams y aplana la lista
+      return Rx.combineLatest(
+        streams,
+        (List<List<TransactionModel>> lists) =>
+            lists.expand((list) => list).toList(), // Aplana las listas
+      );
     });
   }
 }

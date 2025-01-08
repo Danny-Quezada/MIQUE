@@ -31,6 +31,7 @@ dependencies:
   syncfusion_flutter_charts: 22.1.39
   syncfusion_flutter_core: 22.1.39
   flutter_skeleton_ui: ^0.0.6
+  rxdart: ^0.28.0
   
 
 dev_dependencies:

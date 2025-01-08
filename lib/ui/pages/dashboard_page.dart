@@ -43,8 +43,7 @@ class DashboardPage extends StatelessWidget {
             );
           } else if (snapshot.connectionState == ConnectionState.waiting) {
             return const SkeletonView();
-          }
-          if (snapshot.hasData) {
+          } else if (snapshot.hasData) {
             final transactions = snapshot.data!.toList();
 
             final incomes = transactions
