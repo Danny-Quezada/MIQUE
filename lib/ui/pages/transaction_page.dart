@@ -7,6 +7,7 @@ import 'package:mi_que/providers/book_provider.dart';
 import 'package:mi_que/providers/user_provider.dart';
 import 'package:mi_que/ui/utils/date_converter.dart';
 import 'package:mi_que/ui/utils/setting_color.dart';
+import 'package:mi_que/ui/widgets/amount_container_widget.dart';
 import 'package:mi_que/ui/widgets/safe_scaffold.dart';
 import 'package:mi_que/ui/widgets/transaction_widget.dart';
 import 'package:provider/provider.dart';
@@ -42,7 +43,7 @@ class TransactionPage extends StatelessWidget {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    AmountContainer(
+                    AmountContainerWidget(
                         amount: incomes + expenses,
                         title: "Balance neto",
                         color: (incomes + expenses) < 0
@@ -57,7 +58,7 @@ class TransactionPage extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Expanded(
-                              child: AmountContainer(
+                              child: AmountContainerWidget(
                             amount: incomes,
                             color: SettingColor.principalColor,
                             title: "Ingresos",
@@ -66,7 +67,7 @@ class TransactionPage extends StatelessWidget {
                             width: 10,
                           ),
                           Expanded(
-                              child: AmountContainer(
+                              child: AmountContainerWidget(
                                   amount: expenses,
                                   title: "Egresos",
                                   color: SettingColor.redColor)),
@@ -113,47 +114,6 @@ class TransactionPage extends StatelessWidget {
               }
               return Container();
             }));
-  }
-}
-
-class AmountContainer extends StatelessWidget {
-  double amount;
-  String title;
-  Color color;
-  AmountContainer(
-      {super.key,
-      required this.amount,
-      required this.title,
-      required this.color});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-        width: MediaQuery.of(context).size.width,
-        padding: const EdgeInsets.all(10),
-        decoration: BoxDecoration(
-            borderRadius: const BorderRadius.all(Radius.circular(12)),
-            color: color),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              title,
-              style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w400),
-            ),
-            Text(
-              "$amount",
-              style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 25,
-                  fontWeight: FontWeight.w600),
-            )
-          ],
-        ));
   }
 }
 

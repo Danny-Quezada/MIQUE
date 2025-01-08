@@ -10,4 +10,5 @@ Future<bool> updateTransaction(TransactionModel transaction,String bookId, Strin
 Future<bool> deteleBook(String bookId, String userId);
 Future<int> create(BookModel book, String userId);
 Future<bool> updateName(String name, String userId, String bookId);
+Stream<Iterable<TransactionModel>> readTransactionByUser(String userId);
 }

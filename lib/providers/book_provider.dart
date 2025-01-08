@@ -32,8 +32,15 @@ class BookProvider extends ChangeNotifier {
       TransactionModel transaction, String bookId, String userId) async {
     return await iBookModel.createTransaction(transaction, bookId, userId);
   }
-   Future<bool> deleteTransaction(
-      TransactionModel transaction, String bookId, String userId,String date)async {
-        return await iBookModel.deleteTransaction(transaction, bookId, userId, date);
-      }
+
+  Future<bool> deleteTransaction(TransactionModel transaction, String bookId,
+      String userId, String date) async {
+    return await iBookModel.deleteTransaction(
+        transaction, bookId, userId, date);
+  }
+
+  Stream<Iterable<TransactionModel>> readTransactionByUser(
+      String userId) async* {
+    yield* iBookModel.readTransactionByUser(userId);
+  }
 }

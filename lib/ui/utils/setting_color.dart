@@ -18,7 +18,7 @@ class SettingColor {
           ),
         ),
       ),
-      fontFamily: "Onest",
+      fontFamily: "Roboto",
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ButtonStyle(
           foregroundColor: const WidgetStatePropertyAll(Colors.white),

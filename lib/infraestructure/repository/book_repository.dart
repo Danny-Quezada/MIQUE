@@ -55,52 +55,50 @@ class BookRepository implements IBookModel {
   }
 
   @override
-  Future<bool> deleteTransaction(
-      TransactionModel transaction, String bookId, String userId,String date)async {
-        try {
-    // Referencia al documento del libro
-    var bookRef = _fDataSource.firestore
-        .collection('User')
-        .doc(userId)
-        .collection('Book')
-        .doc(bookId);
+  Future<bool> deleteTransaction(TransactionModel transaction, String bookId,
+      String userId, String date) async {
+    try {
+      // Referencia al documento del libro
+      var bookRef = _fDataSource.firestore
+          .collection('User')
+          .doc(userId)
+          .collection('Book')
+          .doc(bookId);
 
-    // Referencia a la transacción dentro del libro
-    var transactionRef =
-        bookRef.collection('Transaction').doc(transaction.id);
+      // Referencia a la transacción dentro del libro
+      var transactionRef =
+          bookRef.collection('Transaction').doc(transaction.id);
 
-    // Ejecutar transacción de Firestore
-    await _fDataSource.firestore.runTransaction((transactionFirestore) async {
-      // Obtener el documento del libro
-      var bookSnapshot = await transactionFirestore.get(bookRef);
+      // Ejecutar transacción de Firestore
+      await _fDataSource.firestore.runTransaction((transactionFirestore) async {
+        // Obtener el documento del libro
+        var bookSnapshot = await transactionFirestore.get(bookRef);
 
-      if (!bookSnapshot.exists) {
-        throw Exception('Book does not found');
-      }
+        if (!bookSnapshot.exists) {
+          throw Exception('Book does not found');
+        }
 
-      // Obtener los datos actuales del libro
-      var bookData = bookSnapshot.data()!;
-      double currentAmount = bookData['amount'] ?? 0.0;
+        // Obtener los datos actuales del libro
+        var bookData = bookSnapshot.data()!;
+        double currentAmount = bookData['amount'] ?? 0.0;
 
-      // Calcular el nuevo monto después de eliminar la transacción
-      
-      double newAmount = currentAmount - transaction.amount;
+        // Calcular el nuevo monto después de eliminar la transacción
 
-      // Actualizar el campo 'amount' en el documento del libro
-      transactionFirestore.update(bookRef, {
-        'amount': newAmount,
-        "date": date
+        double newAmount = currentAmount - transaction.amount;
+
+        // Actualizar el campo 'amount' en el documento del libro
+        transactionFirestore
+            .update(bookRef, {'amount': newAmount, "date": date});
+
+        // Eliminar la transacción de la subcolección 'transactions'
+        transactionFirestore.delete(transactionRef);
       });
 
-      // Eliminar la transacción de la subcolección 'transactions'
-      transactionFirestore.delete(transactionRef);
-    });
-
-    return true;
-  } catch (e) {
-    print('Error: $e');
-    return false;
-  }
+      return true;
+    } catch (e) {
+      print('Error: $e');
+      return false;
+    }
   }
 
   @override
@@ -208,5 +206,35 @@ class BookRepository implements IBookModel {
       print('Error updating name: $e');
       return false;
     }
+  }
+
+  @override
+  Stream<Iterable<TransactionModel>> readTransactionByUser(
+      String userId) async* {
+    yield* _fDataSource.firestore
+        .collection('User')
+        .doc(userId)
+        .collection('Book')
+        .snapshots()
+        .asyncExpand((bookSnapshot) {
+      // Crear streams para cada libro y combinarlos
+      List<Stream<List<TransactionModel>>> streams =
+          bookSnapshot.docs.map((bookDoc) {
+        return bookDoc.reference
+            .collection('Transaction')
+            .snapshots()
+            .map((transactionSnapshot) {
+          return transactionSnapshot.docs.map((transactionDoc) {
+            return TransactionModel.fromFirestore(
+              transactionDoc.data(),
+              transactionDoc.id,
+            );
+          }).toList();
+        });
+      }).toList();
+
+      // Combinar todos los streams en uno solo
+      return Stream.fromFutures(streams.map((s) => s.first));
+    });
   }
 }

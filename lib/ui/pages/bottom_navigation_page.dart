@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mi_que/ui/pages/dashboard_page.dart';
 import 'package:mi_que/ui/pages/principal_page.dart';
 import 'package:mi_que/ui/pages/setting_page.dart';
 import 'package:mi_que/ui/widgets/safe_scaffold.dart';
@@ -46,7 +47,7 @@ class _BottomNavigationPageState extends State<BottomNavigationPage> {
     if (_currentIndex == 0) {
       return PrincipalPage();
     } else if (_currentIndex == 1) {
-      return Center(child: Text('Transacciones'));
+      return DashboardPage();
     } else {
       return SettingPage();
     }

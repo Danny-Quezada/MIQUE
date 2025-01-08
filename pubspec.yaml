@@ -28,6 +28,8 @@ dependencies:
   google_sign_in: ^6.2.2
   flutter_slidable: ^3.1.2
   flutter_iconpicker_plus: ^3.2.3
+  syncfusion_flutter_charts: 22.1.39
+  syncfusion_flutter_core: 22.1.39
 
 dev_dependencies:
   flutter_test:
