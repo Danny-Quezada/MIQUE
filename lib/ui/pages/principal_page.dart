@@ -11,27 +11,34 @@ import 'package:mi_que/ui/widgets/book_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_skeleton_ui/flutter_skeleton_ui.dart';
 
+class PrincipalPage extends StatefulWidget {
+  const PrincipalPage({super.key});
 
-class PrincipalPage extends StatelessWidget {
+  @override
+  State<PrincipalPage> createState() => _PrincipalPageState();
+}
+
+class _PrincipalPageState extends State<PrincipalPage> {
   final TextEditingController _searchController = TextEditingController();
-  PrincipalPage({super.key});
+  List<BookModel> _filteredBooks = [];
+  List<BookModel> _allBooks = [];
 
   @override
   Widget build(BuildContext context) {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     final bookProvider = Provider.of<BookProvider>(context, listen: false);
+
     return Column(
       children: [
         TextField(
           controller: _searchController,
+          onChanged: (value) => _filterBooks(value),
           decoration: const InputDecoration(
             hintText: "Buscar libros",
             prefixIcon: Icon(Icons.search),
           ),
         ),
-        const SizedBox(
-          height: 20,
-        ),
+        const SizedBox(height: 20),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -57,73 +64,97 @@ class PrincipalPage extends StatelessWidget {
               },
               child:
                   const Row(children: [Icon(Icons.add), Text("Agregar libro")]),
-            )
+            ),
           ],
         ),
         Expanded(
-            child: StreamBuilder<Iterable<BookModel>>(
-                stream: bookProvider.readBooks(userProvider.firebaseUser!.uid),
-                builder: (context, snapshot) {
-                  if (snapshot.hasError) {
-                    return const Center(
-                      child: Text("Error al cargar los libros"),
+          child: StreamBuilder<Iterable<BookModel>>(
+            stream: bookProvider.readBooks(userProvider.firebaseUser!.uid),
+            builder: (context, snapshot) {
+              if (snapshot.hasError) {
+                return const Center(
+                  child: Text("Error al cargar los libros"),
+                );
+              } else if (snapshot.connectionState == ConnectionState.waiting) {
+                return SkeletonListView();
+              }
+
+              if (snapshot.hasData) {
+                // Almacenar todos los libros cuando llegan datos
+                _allBooks = snapshot.data!.toList();
+                if (_filteredBooks.isEmpty) {
+                  _filteredBooks = _allBooks;
+                }
+
+                return ListView.builder(
+                  itemCount: _filteredBooks.length,
+                  itemBuilder: (context, index) {
+                    return Slidable(
+                      startActionPane: ActionPane(
+                        motion: const ScrollMotion(),
+                        children: [
+                          SlidableAction(
+                            onPressed: (context) {
+                              showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return AlertDialog(
+                                    title: const Text(
+                                      "Actualizar libro",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    content: BookForm(
+                                      bookModel: _filteredBooks[index],
+                                    ),
+                                  );
+                                },
+                              );
+                            },
+                            icon: Icons.update_rounded,
+                            backgroundColor: SettingColor.principalColor,
+                          ),
+                          SlidableAction(
+                            onPressed: (context) {
+                              bookProvider.deleteBook(
+                                _filteredBooks[index].id,
+                                userProvider.firebaseUser!.uid,
+                              );
+                            },
+                            icon: Icons.delete_rounded,
+                            backgroundColor: SettingColor.redColor,
+                          ),
+                        ],
+                      ),
+                      child: BookWidget(bookModel: _filteredBooks[index]),
                     );
-                  } else if (snapshot.connectionState ==
-                      ConnectionState.waiting) {
-                    return SkeletonListView();
-                  }
-                  if (snapshot.hasData) {
-                    return ListView.builder(
-                      itemCount: snapshot.data!.length,
-                      itemBuilder: (context, index) {
-                        return Slidable(
-                          startActionPane: ActionPane(
-                              motion: const ScrollMotion(),
-                              children: [
-                                SlidableAction(
-                                  onPressed: (context) {
-                                    showDialog(
-                                      context: context,
-                                      builder: (context) {
-                                        return AlertDialog(
-                                          title: const Text(
-                                            "Actualizar libro",
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.bold),
-                                          ),
-                                          content: BookForm(
-                                            bookModel:
-                                                snapshot.data!.elementAt(index),
-                                          ),
-                                        );
-                                      },
-                                    );
-                                  },
-                                  icon: Icons.update_rounded,
-                                  backgroundColor: SettingColor.principalColor,
-                                ),
-                                SlidableAction(
-                                  onPressed: (context) {
-                                    bookProvider.deleteBook(
-                                        snapshot.data!.elementAt(index).id,
-                                        userProvider.firebaseUser!.uid);
-                                  },
-                                  icon: Icons.delete_rounded,
-                                  backgroundColor: SettingColor.redColor,
-                                ),
-                              ]),
-                          child: BookWidget(
-                              bookModel: snapshot.data!.elementAt(index)),
-                        );
-                      },
-                    );
-                  }
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
-                }))
+                  },
+                );
+              }
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            },
+          ),
+        ),
       ],
     );
+  }
+
+  // Método para filtrar libros
+  void _filterBooks(String query) {
+    if (query.isEmpty) {
+      setState(() {
+        _filteredBooks = _allBooks;
+      });
+    } else {
+      setState(() {
+        _filteredBooks = _allBooks
+            .where((book) =>
+                book.title.toLowerCase().contains(query.toLowerCase()))
+            .toList();
+      });
+    }
   }
 }
 
