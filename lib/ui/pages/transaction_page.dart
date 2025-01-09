@@ -212,7 +212,6 @@ class BottomButtons extends StatelessWidget {
                   context: context,
                   builder: (context) {
                     return AlertDialog(
-                      titlePadding: EdgeInsets.zero,
                       title: const Text(
                         "Egreso",
                         style: TextStyle(
