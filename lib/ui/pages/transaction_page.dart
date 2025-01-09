@@ -212,6 +212,7 @@ class BottomButtons extends StatelessWidget {
                   context: context,
                   builder: (context) {
                     return AlertDialog(
+                      titlePadding: EdgeInsets.zero,
                       title: const Text(
                         "Egreso",
                         style: TextStyle(
@@ -256,13 +257,30 @@ class _TransactionFormState extends State<TransactionForm> {
 
   TextEditingController _nameController = TextEditingController();
   TextEditingController _amountController = TextEditingController();
-
+  DateTime _datetime = DateTime.now();
   _pickIcon() async {
-    IconData? icon = await FlutterIconPicker.showIconPicker(context,
-        iconPackModes: [IconPack.material]);
+    IconData? icon =
+        await FlutterIconPicker.showIconPicker(context, iconPackModes: [
+      IconPack.custom
+    ], customIconPack: {
+      "Universidad": Icons.school,
+      "Renta": Icons.house,
+      "Dinero": Icons.money_sharp,
+      "Luz": Icons.lightbulb_sharp,
+      "Agua": Icons.water_damage_rounded,
+      "Comida": Icons.food_bank,
+      "GYM": Icons.sports_gymnastics_outlined,
+      "Niños": Icons.diversity_1_sharp,
+      "Gasolina": Icons.local_gas_station_sharp,
+      "Juegos": Icons.games,
+      "Diversión": Icons.park_rounded
+    });
 
-    _icon = Icon(icon);
-    setState(() {});
+    _icon = icon != null ? Icon(icon) : _icon;
+    if (_icon.icon != _icon.icon) {
+      setState(() {});
+    }
+
     debugPrint('Picked Icon:  $icon');
   }
 
@@ -278,6 +296,9 @@ class _TransactionFormState extends State<TransactionForm> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            const SizedBox(
+              height: 5,
+            ),
             TextFormField(
               controller: _nameController,
               decoration: InputDecoration(
@@ -313,6 +334,32 @@ class _TransactionFormState extends State<TransactionForm> {
             const SizedBox(
               height: 15,
             ),
+            const Text(
+              "Seleccione fecha o por defecto hoy",
+              style: TextStyle(fontSize: 12),
+            ),
+            TextButton(
+                style: ButtonStyle(
+                    foregroundColor: WidgetStatePropertyAll(
+                        widget.isIncome == true
+                            ? SettingColor.greenColor
+                            : SettingColor.redColor),
+                    padding: WidgetStatePropertyAll(EdgeInsets.zero)),
+                onPressed: () async {
+                  _datetime = await showDatePicker(
+                          context: context,
+                          firstDate: DateTime(1990),
+                          lastDate: DateTime(2030)) ??
+                      DateTime.now();
+                  if (_datetime != DateTime.now()) {
+                    setState(() {});
+                  }
+                },
+                child: Text(
+                    DateConverter.formatDateWithMonthName(date: _datetime))),
+            const SizedBox(
+              height: 8,
+            ),
             const Text("Escoja icono"),
             IconButton(
                 onPressed: _pickIcon,
@@ -341,7 +388,8 @@ class _TransactionFormState extends State<TransactionForm> {
                                 ? double.parse(_amountController.text)
                                 : -double.parse(_amountController.text),
                             iconName: _icon.icon!.codePoint.toString(),
-                            date: DateConverter.formatDateWithMonthName()),
+                            date: DateConverter.formatDateWithMonthName(
+                                date: _datetime)),
                         widget.bookModel.id,
                         userProvider.firebaseUser!.uid);
                     Navigator.pop(context);

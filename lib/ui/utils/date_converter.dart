@@ -13,12 +13,12 @@ class DateConverter {
     'noviembre',
     'diciembre'
   ];
-  static String formatDateWithMonthName() {
-    final now = DateTime.now();
+  static String formatDateWithMonthName({DateTime? date}) {
+    final datetime = date ?? DateTime.now();
 
-    final day = now.day.toString().padLeft(2, '0');
-    final month = monthNames[now.month - 1];
-    final year = now.year;
+    final day = datetime.day.toString().padLeft(2, '0');
+    final month = monthNames[datetime.month - 1];
+    final year = datetime.year;
 
     return '$day de $month de $year';
   }
