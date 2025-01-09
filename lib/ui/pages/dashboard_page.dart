@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_skeleton_ui/flutter_skeleton_ui.dart';
@@ -27,6 +29,7 @@ class DashboardPage extends StatelessWidget {
 
     return SafeScaffold(
       appBar: AppBar(
+        elevation: 0,
         centerTitle: true,
         title: const Text(
           'Resumen de Transacciones',
@@ -43,7 +46,8 @@ class DashboardPage extends StatelessWidget {
             );
           } else if (snapshot.connectionState == ConnectionState.waiting) {
             return const SkeletonView();
-          } else if (snapshot.hasData) {
+          } else if (snapshot.connectionState == ConnectionState.active &&
+              snapshot.hasData) {
             final transactions = snapshot.data!.toList();
 
             final incomes = transactions
@@ -65,7 +69,8 @@ class DashboardPage extends StatelessWidget {
                           width: 200,
                           fit: BoxFit.cover,
                         ),
-                        Text("Agrega transacciones para poder ver resumen")
+                        const Text(
+                            "Agrega transacciones para poder ver resumen")
                       ],
                     ),
                   )
@@ -136,7 +141,18 @@ class DashboardPage extends StatelessWidget {
           xValueMapper: (ChartData data, _) => data.category,
           yValueMapper: (ChartData data, _) => data.value,
           pointColorMapper: (ChartData data, _) => data.color,
-          dataLabelSettings: const DataLabelSettings(isVisible: true),
+          dataLabelSettings: DataLabelSettings(
+            isVisible: true,
+            builder: (data, point, series, pointIndex, seriesIndex) => Text(
+              "${data.value.toStringAsFixed(2)}",
+              style: TextStyle(
+                color: data.category == 'Ingresos'
+                    ? SettingColor.greenColor
+                    : SettingColor.redColor,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
         ),
       ],
     );
@@ -179,7 +195,7 @@ class DashboardPage extends StatelessWidget {
 
     return SfCartesianChart(
       margin: EdgeInsets.zero,
-      primaryXAxis: categoryAxis,
+      primaryXAxis: CategoryAxis(),
       primaryYAxis: numericAxis,
       borderWidth: 0,
       plotAreaBorderWidth: 0,
@@ -250,43 +266,46 @@ class DashboardPage extends StatelessWidget {
       chartData.add(ChartData(nextMonthKey, average, isPrediction: true));
     }
 
-    return SfCartesianChart(
-      margin: EdgeInsets.zero,
-      primaryXAxis: categoryAxis,
-      primaryYAxis: numericAxis,
-      borderWidth: 0,
-      plotAreaBorderWidth: 0,
-      title: _chartTitle('Proyección de Ingresos/Gastos'),
-      series: <LineSeries<ChartData, String>>[
-        LineSeries<ChartData, String>(
-          dataSource: chartData,
-          xValueMapper: (ChartData data, _) => data.category,
-          yValueMapper: (ChartData data, _) => data.value,
-          dataLabelSettings: const DataLabelSettings(isVisible: true),
-          pointColorMapper: (ChartData data, _) => data.isPrediction == true
-              ? data.value < 0
-                  ? SettingColor.redColor
-                  : SettingColor.greenColor
-              : Colors.blue,
-          markerSettings: const MarkerSettings(
-            isVisible: true,
-            shape: DataMarkerType.circle,
-          ),
-        ),
-      ],
-      annotations: <CartesianChartAnnotation>[
-        CartesianChartAnnotation(
-          widget: Text(
-            'Estimación: \$${average.toStringAsFixed(2)}',
-            style: const TextStyle(
-              color: Colors.orange,
-              fontWeight: FontWeight.bold,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SfCartesianChart(
+          margin: EdgeInsets.zero,
+          primaryXAxis: CategoryAxis(),
+          primaryYAxis: numericAxis,
+          borderWidth: 0,
+          plotAreaBorderWidth: 0,
+          title: _chartTitle('Proyección de Ingresos/Gastos'),
+          series: <LineSeries<ChartData, String>>[
+            LineSeries<ChartData, String>(
+              dataSource: chartData,
+              xValueMapper: (ChartData data, _) => data.category,
+              yValueMapper: (ChartData data, _) => data.value,
+              dataLabelSettings: const DataLabelSettings(isVisible: true),
+              pointColorMapper: (ChartData data, _) => data.isPrediction == true
+                  ? data.value < 0
+                      ? SettingColor.redColor
+                      : SettingColor.greenColor
+                  : Colors.blue,
+              markerSettings: const MarkerSettings(
+                isVisible: true,
+                shape: DataMarkerType.circle,
+              ),
             ),
-          ),
-          coordinateUnit: CoordinateUnit.point,
-          x: chartData.last.category,
-          y: chartData.last.value,
+          ],
         ),
+        Text.rich(TextSpan(children: [
+          const TextSpan(text: "El circulo "),
+          TextSpan(
+              text: average < 0 ? "rojo " : "verde ",
+              style: TextStyle(
+                  color: average < 0
+                      ? SettingColor.redColor
+                      : SettingColor.greenColor)),
+          TextSpan(
+              text:
+                  "indica un valor futuro de balance neto de ${DateConverter.monthNames[int.parse(chartData[chartData.length - 1].category.substring(0, 1)) - 1]}.")
+        ]))
       ],
     );
   }
@@ -313,7 +332,8 @@ class DashboardPage extends StatelessWidget {
       margin: EdgeInsets.zero,
       primaryXAxis: CategoryAxis(),
       primaryYAxis: numericAxis,
-      title: _chartTitle('Gastos Diarios'),
+      title: _chartTitle(
+          'Balance neto por día de: ${DateConverter.monthNames[today.month - 1].toUpperCase()}'),
       series: <LineSeries<ChartData, String>>[
         LineSeries<ChartData, String>(
           dataSource: chartData,
