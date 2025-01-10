@@ -276,7 +276,7 @@ class _TransactionFormState extends State<TransactionForm> {
     });
 
     _icon = icon != null ? Icon(icon) : _icon;
-    if (_icon.icon != _icon.icon) {
+    if (_icon.icon == icon) {
       setState(() {});
     }
 
