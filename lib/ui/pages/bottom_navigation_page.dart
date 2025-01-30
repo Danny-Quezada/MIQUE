@@ -13,10 +13,19 @@ class BottomNavigationPage extends StatefulWidget {
 
 class _BottomNavigationPageState extends State<BottomNavigationPage> {
   int _currentIndex = 0;
+
+  final List<Widget> _pages = [
+    PrincipalPage(),
+    DashboardPage(),
+    const SettingPage()
+  ];
   @override
   Widget build(BuildContext context) {
     return SafeScaffold(
-      body: _buildBody(),
+      body: IndexedStack(
+        index: _currentIndex,
+        children: _pages,
+      ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         fixedColor: Colors.blue,
