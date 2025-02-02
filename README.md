@@ -22,7 +22,6 @@
 - Edita los detalles de los libros según tus necesidades.
 - Elimina libros que ya no necesitas.
 
-
 <div style="display: flex; justify-content: space-around;">
   <img src="https://media.githubusercontent.com/media/Danny-Quezada/MIQUE/main/Documentation/Screenshots/Books.jpg" alt="Mostrar libros" width="45%">
   <img src="https://media.githubusercontent.com/media/Danny-Quezada/MIQUE/main/Documentation/Screenshots/DeleteBooks.jpg" alt="Eliminar libros" width="45%">
@@ -69,7 +68,7 @@ Visualiza tus datos financieros en tiempo real:
 
 ¡Mira MIQUE en acción! Aprende cómo gestionar tus finanzas con esta increíble aplicación:
 
-[![Video de demostración](https://media.githubusercontent.com/media/Danny-Quezada/MIQUE/main/Documentation/Video.mp4)
+[![Video de demostración](https://media.githubusercontent.com/media/Danny-Quezada/MIQUE/main/Documentation/Video.gif)](https://media.githubusercontent.com/media/Danny-Quezada/MIQUE/main/Documentation/Video.gif)
 
 ---
 
@@ -80,55 +79,31 @@ Visualiza tus datos financieros en tiempo real:
   - Autenticación de usuarios.
   - Almacenamiento de datos en tiempo real.
   
-  
 ---
 
-## Instalación
+## Integración de IA en MIQUE
 
-1. **Configura Firebase:**
-   - Crea un proyecto en Firebase.
-   - Activa la autenticación de Google y la de correo electrónico.
-   - Conecta el proyecto de Firebase con Flutter siguiendo las instrucciones oficiales de Firebase.
+### Análisis inteligente de finanzas
+La versión de MIQUE con inteligencia artificial se encuentra en la rama `AI_MIQUE`, donde se implementa un asistente que analiza:
+- **El dashboard completo**, proporcionando insights sobre tus finanzas.
+- **Las transacciones completas de un libro**, identificando patrones de ingresos y egresos.
+- **Cada transacción individualmente**, ayudándote a tomar mejores decisiones financieras.
 
-2. **Configura las variables de entorno:**
-   - Obtén las credenciales de configuración de Firebase que proporciona Flutter.
-   - Crea un archivo `.env` en la carpeta `assets` del proyecto.
-   - Añade las variables necesarias en el archivo `.env`. Por ejemplo:
-     ```env
-     FIREBASE_API_KEY=tu_api_key
-     FIREBASE_AUTH_DOMAIN=tu_auth_domain
-     FIREBASE_PROJECT_ID=tu_project_id
-     FIREBASE_STORAGE_BUCKET=tu_storage_bucket
-     FIREBASE_MESSAGING_SENDER_ID=tu_sender_id
-     FIREBASE_APP_ID=tu_app_id
-     ```
+### Configuración de IA
+Para habilitar la funcionalidad de IA, debes configurar las siguientes variables en el archivo `.env`:
+```env
+BASE_URL=tu_base_url
+ENDPOINT=tu_endpoint
+API_KEY=tu_api_key
+MODEL=tu_modelo
+```
+Estas variables permitirán que la aplicación se comunique con el asistente de IA para analizar y brindar recomendaciones personalizadas sobre tus finanzas.
 
-3. Clona este repositorio:
-   ```bash
-   git clone https://github.com/tu_usuario/mique.git
-   ```
-4. Navega al directorio del proyecto:
-   ```bash
-   cd mique
-   ```
-5. Instala las dependencias:
-   ```bash
-   flutter pub get
-   ```
-6. Conecta un dispositivo o emulador y ejecuta:
-   ```bash
-   flutter run
-   ```
+### Video de demostración de IA
 
----
+¡Descubre cómo la inteligencia artificial de MIQUE puede ayudarte a analizar tus finanzas!
 
-## Capturas de pantalla
-
-### Pantallas principales
-- Registro e inicio de sesión
-- Gestión de libros
-- Registro de ingresos y egresos
-- Dashboard
+[![Video de demostración de IA](https://media.githubusercontent.com/media/Danny-Quezada/MIQUE/main/Documentation/AIVideo.gif)](https://media.githubusercontent.com/media/Danny-Quezada/MIQUE/main/Documentation/AIVideo.gif)
 
 ---
 
