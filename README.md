@@ -67,8 +67,8 @@ Visualiza tus datos financieros en tiempo real:
 ## Video de demostración
 
 ¡Mira MIQUE en acción! Aprende cómo gestionar tus finanzas con esta increíble aplicación:
+<img src="./Documentation/Video.gif"/>
 
-[![Video de demostración](https://media.githubusercontent.com/media/Danny-Quezada/MIQUE/main/Documentation/Video.gif)](https://media.githubusercontent.com/media/Danny-Quezada/MIQUE/main/Documentation/Video.gif)
 
 ---
 
@@ -103,7 +103,12 @@ Estas variables permitirán que la aplicación se comunique con el asistente de 
 
 ¡Descubre cómo la inteligencia artificial de MIQUE puede ayudarte a analizar tus finanzas!
 
-[![Video de demostración de IA](https://media.githubusercontent.com/media/Danny-Quezada/MIQUE/main/Documentation/AIVideo.gif)](https://media.githubusercontent.com/media/Danny-Quezada/MIQUE/main/Documentation/AIVideo.gif)
+
+
+
+<img src="./Documentation/AIVideo.gif"/>
+
+
 
 ---
 
