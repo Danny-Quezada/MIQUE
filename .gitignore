@@ -49,7 +49,7 @@ ios/Runner/GoogleService-Info.plist
 .firebasehostingcache/
 firebase-debug.log
 .firebaserc
-
+firebase.json
 # Flutter
 **/build/
 **/.dart_tool/
