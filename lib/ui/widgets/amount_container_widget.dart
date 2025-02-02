@@ -2,11 +2,11 @@
 import 'package:flutter/material.dart';
 
 class AmountContainerWidget extends StatelessWidget {
-  double amount;
-  String title;
-  Color color;
+  final double amount;
+  final String title;
+  final Color color;
 
-  AmountContainerWidget(
+ const AmountContainerWidget(
       {super.key,
       required this.amount,
       required this.title,

@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_iconpicker_plus/flutter_iconpicker.dart';
+
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:icons_plus/icons_plus.dart';
+
 import 'package:mi_que/domain/entities/book_model.dart';
 import 'package:mi_que/domain/entities/transaction_model.dart';
+
 import 'package:mi_que/providers/book_provider.dart';
 import 'package:mi_que/providers/user_provider.dart';
+import 'package:mi_que/ui/widgets/ai_button.dart';
 import 'package:mi_que/ui/utils/date_converter.dart';
 import 'package:mi_que/ui/utils/setting_color.dart';
 import 'package:mi_que/ui/widgets/amount_container_widget.dart';
@@ -44,13 +49,15 @@ class TransactionPage extends StatelessWidget {
                 final expenses = snapshot.data!
                     .where((x) => x.amount < 0)
                     .fold<double>(0.0, (sum, element) => sum + element.amount);
+                final netBalance = incomes + expenses;
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     AmountContainerWidget(
-                        amount: incomes + expenses,
+                        amount: netBalance,
                         title: "Balance neto",
-                        color: (incomes + expenses) < 0
+                        color: (netBalance) < 0
                             ? SettingColor.redColor
                             : SettingColor.principalColor),
                     const SizedBox(
@@ -78,6 +85,13 @@ class TransactionPage extends StatelessWidget {
                         ],
                       ),
                     ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    AIButton(
+                        transactions: snapshot.data!,
+                        incomes: incomes,
+                        expenses: expenses),
                     const SizedBox(
                       height: 10,
                     ),
@@ -400,5 +414,49 @@ class _TransactionFormState extends State<TransactionForm> {
         ),
       ),
     );
+  }
+}
+
+class AIButton extends StatelessWidget {
+  final Iterable<TransactionModel> transactions;
+  final double incomes;
+  final double expenses;
+
+  const AIButton(
+      {super.key,
+      required this.transactions,
+      required this.incomes,
+      required this.expenses});
+
+  @override
+  Widget build(BuildContext context) {
+    return TextButton.icon(
+        iconAlignment: IconAlignment.end,
+        icon: const Icon(AntDesign.robot_outline),
+        onPressed: () async {
+          String transactionSummary = transactions.map((transaction) {
+            return "- **${transaction.name}**: \$${transaction.amount} (${transaction.date})";
+          }).join("\n");
+
+          double netBalance = incomes + expenses;
+
+          await aiButton("""
+📊 **Resumen Financiero Actual**  
+💰 **Ingresos Totales:** \$$incomes  
+💸 **Egresos Totales:** \$$expenses  
+🔎 **Balance Neto:** \$$netBalance  
+
+📂 **Transacciones Recientes:**  
+$transactionSummary  
+
+🧐 **Instrucciones para el análisis:**  
+- Evalúa mis gastos y patrones financieros.  
+- Sugiere estrategias para optimizar mi presupuesto.  
+- Identifica posibles áreas de ahorro sin afectar necesidades esenciales.  
+
+🔍 **Enfócate en proporcionar consejos prácticos y personalizados.**  
+""", context);
+        },
+        label: const Text("Recibir opinión de MIQUE IA"));
   }
 }
